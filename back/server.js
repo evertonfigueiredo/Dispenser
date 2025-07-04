@@ -16,13 +16,20 @@ const wss = new WebSocket.Server({ server });
 // Rota HTTP para verificar status do ESP
 app.get("/status", async (req, res) => {
   try {
-    const r = await fetch(`${ESP_IP}/status`);
-    const status = await r.json(); // espera JSON como: { "estado": "ligado" }
-    res.json(status);
+    console.log("Requisição recebida para /status")
+
+    const response = await fetch(`${ESP_IP}/status`)
+    const status = await response.json()
+
+    console.log("Estado do ESP:", status)
+    res.json(status) // ✅ envia o JSON de volta para o navegador
+
   } catch (e) {
-    res.status(500).json({ erro: "Erro ao consultar status do ESP" });
+    console.error("Erro ao buscar status do ESP:", e)
+    res.status(500).json({ erro: "Erro ao consultar status do ESP" })
   }
-});
+})
+
 
 // WebSocket: conexão e mensagens
 wss.on("connection", (ws) => {
@@ -33,7 +40,9 @@ wss.on("connection", (ws) => {
     .then((res) => res.json())
     .then((status) => {
       console.log("Enviando estado inicial:", status);
-      ws.send(JSON.stringify(status)); // envia { "estado": "ligado" }
+      console.log("Estado do ESP:", status);
+      
+      // ws.send(JSON.stringify(status)); // envia { "estado": "ligado" }
     })
     .catch((err) => {
       console.error("Erro ao buscar status inicial:", err);
@@ -43,7 +52,7 @@ wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const msg = message.toString();
 
-    if (msg === "ligar" || msg === "desligar") {
+    if (msg === "ligar_1" || msg === "desligar_1") {
       const url = `${ESP_IP}/${msg}`;
       console.log(`Comando recebido: ${msg}. Enviando para ESP: ${url}`);
 
