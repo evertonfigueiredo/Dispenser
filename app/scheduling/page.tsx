@@ -17,6 +17,7 @@ import { Navigation } from "../../components/navigation"
 import { useScheduling } from "../../hooks/use-scheduling"
 import { cn } from "@/lib/utils"
 import type { ScheduledCommand } from "../../types"
+import { ptBR } from "date-fns/locale"
 
 export default function SchedulingPage() {
   const [selectedChannel, setSelectedChannel] = useState<string>("")
@@ -79,7 +80,7 @@ export default function SchedulingPage() {
     const [hours, minutes] = time.split(":").map(Number)
     const dateTime = new Date(date)
     dateTime.setHours(hours, minutes, 0, 0)
-    return format(dateTime, "PPP 'at' p")
+    return format(dateTime, "PPP 'às' p", { locale: ptBR })
   }
 
   const getTimeUntilActivation = (scheduledAt: Date) => {
@@ -105,40 +106,40 @@ export default function SchedulingPage() {
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2 cursor-pointer">
                 <ArrowLeft className="h-4 w-4" />
-                Back to Device Control
+                Voltar para Controle de Dispositivos
               </Button>
             </Link>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Schedule Channel Activation</h1>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Agendar Ativação de Canal</h1>
           <p className="text-muted-foreground">
-            Schedule when specific channels should be activated. Set the date and time for automatic activation.
+            Agende quando canais específicos devem ser ativados. Defina a data e a hora para a ativação automática.
           </p>
         </div>
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>{editingCommand ? "Edit Schedule" : "New Schedule"}</CardTitle>
+            <CardTitle>{editingCommand ? "Editar Agendamento" : "Novo Agendamento"}</CardTitle>
             <CardDescription>
               {editingCommand
-                ? "Modify the selected scheduled activation."
-                : "Select a channel and schedule when it should be activated."}
+                ? "Modifique a ativação agendada selecionada."
+                : "Selecione um canal e agende quando ele deve ser ativado."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Channel Selection */}
               <div className="space-y-2">
-                <Label htmlFor="channel">Channel</Label>
+                <Label htmlFor="channel">Canal</Label>
                 <Select value={selectedChannel} onValueChange={setSelectedChannel}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select channel" />
+                    <SelectValue placeholder="Selecionar canal" />
                   </SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 1 }, (_, i) => i + 1).map((channel) => (
                       <SelectItem key={channel} value={channel.toString()}>
-                        Channel {channel}
+                        Canal {channel}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -147,7 +148,7 @@ export default function SchedulingPage() {
 
               {/* Date Selection */}
               <div className="space-y-2">
-                <Label>Date</Label>
+                <Label>Data</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -158,7 +159,7 @@ export default function SchedulingPage() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                      {selectedDate ? format(selectedDate, "PPP") : "Escolha uma data"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -175,7 +176,7 @@ export default function SchedulingPage() {
 
               {/* Time Selection */}
               <div className="space-y-2">
-                <Label htmlFor="time">Time</Label>
+                <Label htmlFor="time">Hora</Label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -193,10 +194,10 @@ export default function SchedulingPage() {
               {editingCommand ? (
                 <>
                   <Button onClick={handleUpdate} disabled={!selectedChannel || !selectedDate || !selectedTime}>
-                    Update Schedule
+                    Atualizar Agendamento
                   </Button>
                   <Button onClick={handleCancelEdit} variant="outline">
-                    Cancel
+                    Cancelar
                   </Button>
                 </>
               ) : (
@@ -205,7 +206,7 @@ export default function SchedulingPage() {
                   className="w-full md:w-auto"
                   disabled={!selectedChannel || !selectedDate || !selectedTime}
                 >
-                  Schedule Activation
+                  Agendar Ativação
                 </Button>
               )}
             </div>
@@ -215,11 +216,11 @@ export default function SchedulingPage() {
         {/* Scheduled Commands */}
         <Card>
           <CardHeader>
-            <CardTitle>Scheduled Activations</CardTitle>
+            <CardTitle>Ativações Agendadas</CardTitle>
             <CardDescription>
               {scheduledCommands.length === 0
-                ? "No activations scheduled yet."
-                : `${scheduledCommands.length} activation${scheduledCommands.length === 1 ? "" : "s"} scheduled.`}
+                ? "Nenhuma ativação agendada ainda."
+                : `${scheduledCommands.length} ativação${scheduledCommands.length === 1 ? "" : "s"} agendadas.`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -228,16 +229,16 @@ export default function SchedulingPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Channel</TableHead>
-                      <TableHead>Scheduled Date & Time</TableHead>
-                      <TableHead>Time Until Activation</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+                      <TableHead>Canal</TableHead>
+                      <TableHead>Data & Hora Agendada</TableHead>
+                      <TableHead>Tempo Até Ativação</TableHead>
+                      <TableHead className="w-[100px]">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {scheduledCommands.map((command) => (
                       <TableRow key={command.id}>
-                        <TableCell className="font-medium">Channel {command.channel}</TableCell>
+                        <TableCell className="font-medium">Canal {command.channel}</TableCell>
                         <TableCell>{formatDateTime(command.date, command.time)}</TableCell>
                         <TableCell>
                           <span
@@ -260,7 +261,7 @@ export default function SchedulingPage() {
                               className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
                             >
                               <Pencil className="h-4 w-4" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Editar</span>
                             </Button>
                             <Button
                               variant="ghost"
@@ -269,7 +270,7 @@ export default function SchedulingPage() {
                               className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                             >
                               <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Excluir</span>
                             </Button>
                           </div>
                         </TableCell>
@@ -281,8 +282,8 @@ export default function SchedulingPage() {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <Clock className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                <p>No scheduled activations yet.</p>
-                <p className="text-sm">Schedule your first channel activation above.</p>
+                <p>Nenhuma ativação agendada ainda.</p>
+                <p className="text-sm">Agende sua primeira ativação de canal acima.</p>
               </div>
             )}
           </CardContent>

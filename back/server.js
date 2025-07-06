@@ -5,7 +5,7 @@ const cors = require("cors");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-const ESP_IP = "http://192.168.1.5";
+const ESP_IP = "http://192.168.1.3";
 const PORT = 4000;
 
 const app = express();
@@ -42,7 +42,7 @@ wss.on("connection", (ws) => {
       console.log("Enviando estado inicial:", status);
       console.log("Estado do ESP:", status);
       
-      // ws.send(JSON.stringify(status)); // envia { "estado": "ligado" }
+      ws.send(JSON.stringify(status)); // envia { "estado": "ligado" }
     })
     .catch((err) => {
       console.error("Erro ao buscar status inicial:", err);
@@ -52,7 +52,7 @@ wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const msg = message.toString();
 
-    if (msg === "ligar_1" || msg === "desligar_1") {
+    if (msg === "ligar" || msg === "desligar") {
       const url = `${ESP_IP}/${msg}`;
       console.log(`Comando recebido: ${msg}. Enviando para ESP: ${url}`);
 

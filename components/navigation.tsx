@@ -12,15 +12,15 @@ export function Navigation() {
   return (
     <nav className="flex items-center gap-4 mb-8">
       <Link href="/">
-        <Button variant={pathname === "/" ? "default" : "outline"} className={cn("flex items-center gap-2")}>
+        <Button variant={pathname === "/" ? "default" : "outline"} className={cn("flex items-center gap-2 cursor-pointer")}>
           <Settings className="h-4 w-4" />
-          Device Control
+          Controle de Dispositivos
         </Button>
       </Link>
       <Link href="/scheduling">
-        <Button variant={pathname === "/scheduling" ? "default" : "outline"} className={cn("flex items-center gap-2")}>
+        <Button variant={pathname === "/scheduling" ? "default" : "outline"} className={cn("flex items-center gap-2 cursor-pointer")}>
           <Calendar className="h-4 w-4" />
-          Scheduling
+          Agendamento
         </Button>
       </Link>
     </nav>

@@ -30,17 +30,17 @@ export default function DeviceControlPage() {
     ws.current = socket
 
     socket.onopen = () => {
-      console.log("🟢 WebSocket conectado")
+      // console.log("🟢 WebSocket conectado")
     }
 
     socket.onmessage = (event) => {
-      console.log("🔄 WS data:", event.data)
+      // console.log("🔄 WS data:", event.data)
       try {
         const data = JSON.parse(event.data) // ex: { estado1: "ligado", estado2: "desligado" }
-
+        // console.log("Estado do ESP:", data)
         setDevices((prev) =>
           prev.map((device) => {
-            const key = `estado${device.channel}`
+            const key = `estado`
             if (data.hasOwnProperty(key)) {
               return { ...device, isOn: data[key] === "ligado", isLoading: false }
             }
@@ -56,7 +56,7 @@ export default function DeviceControlPage() {
 
     socket.onerror = () => console.error("❌ WebSocket erro")
     socket.onclose = () => {
-      console.warn("⚠️ WS desconectado. Tentando reconectar...")
+      // console.warn("⚠️ WS desconectado. Tentando reconectar...")
       setTimeout(connectWebSocket, 3000)
     }
   }
@@ -75,8 +75,8 @@ export default function DeviceControlPage() {
 
       const current = devices.find((d) => d.channel === channel)
       if (!current) return
-      const comando = current.isOn ? `desligar_${channel}` : `ligar_${channel}`
-      console.log("🔼 Enviando comando:", comando)
+      const comando = current.isOn ? `desligar` : `ligar`
+      // console.log("🔼 Enviando comando:", comando)
       ws.current.send(comando)
     }
   }
@@ -88,19 +88,19 @@ export default function DeviceControlPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">
-            Device Control
+            Controle de Dispositivos
           </h1>
           <p className="text-muted-foreground">
-            Control your devices by turning channels on or off in real time.
+            Controle seus dispositivos ligando ou desligando canais em tempo real.
           </p>
         </div>
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Channel Status Overview</CardTitle>
+            <CardTitle>Visão Geral do Status dos Canais</CardTitle>
             <CardDescription>
-              {devices.filter((d) => d.isOn).length} of {devices.length} channels are
-              currently active
+              {devices.filter((d) => d.isOn).length} de {devices.length} canais estão
+              atualmente ativos
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -123,7 +123,11 @@ export default function DeviceControlPage() {
         </Card>
 
         {!ready ? (
-          <p className="text-gray-500 animate-pulse">Conectando ao WebSocket...</p>
+                  <div className="flex items-center justify-center">
+                    <div className="animate-ping h-2.5 w-2.5 rounded-full bg-gray-500 mr-2"></div>
+                    <div className="animate-ping h-2.5 w-2.5 rounded-full bg-gray-500 mr-2"></div>
+                    <div className="animate-ping h-2.5 w-2.5 rounded-full bg-gray-500"></div>
+                  </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {devices.map((device) => (

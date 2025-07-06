@@ -1,6 +1,6 @@
 #include "SoftwareSerial.h"
 
-SoftwareSerial ESP_Serial(10, 11);  // RX, TX
+SoftwareSerial ESP_Serial(10, 11); // RX, TX
 
 String rede = "COMPUTADOR";
 String senha = "demetrio";
@@ -15,8 +15,8 @@ void setup() {
 
   Serial.begin(9600);
   ESP_Serial.begin(9600);
-
-  delay(1000);  //espera de seguranca
+  
+  delay(1000); //espera de seguranca
 
   Serial.println("Conectando a rede...");
   String CWJAP = "\"AT+CWJAP=\"";
@@ -27,9 +27,9 @@ void setup() {
   sendCommand(CWJAP);
   readResponse(10000);
 
-  delay(2000);  //espera de seguranca
+  delay(2000); //espera de seguranca
 
-  if (resposta.indexOf("OK") == -1) {  //procura na resposta se houve OK
+  if (resposta.indexOf("OK") == -1) { //procura na resposta se houve OK
     Serial.println("Atencao: Nao foi possivel conectar a rede WiFi.");
     Serial.println("Verifique se o nome da rede e senha foram preenchidos corretamente no codigo e tente novamente.");
   } else {
@@ -71,27 +71,31 @@ void loop() {
 
       String respostaApi = "";
 
-      if (request.indexOf("/ligar_1") != -1) {
+      if (request.indexOf("/ligar") != -1) {
         digitalWrite(rele, HIGH);
         estadoRele = 1;
         respostaApi = "ligado";
-      } else if (request.indexOf("/desligar_1") != -1) {
+      } 
+      else if (request.indexOf("/desligar") != -1) {
         digitalWrite(rele, LOW);
         estadoRele = 0;
         respostaApi = "desligado";
-      } else if (request.indexOf("/status") != -1) {
+      } 
+      else if (request.indexOf("/status") != -1) {
         respostaApi = (estadoRele == 1) ? "ligado" : "desligado";
-      } else {
+      } 
+      else {
         respostaApi = "invalido";
       }
 
       // monta a resposta em JSON
-      String json = String("{") +
-                    "\"estado1\": \"" + respostaApi + "\"," +
-                    "}";
+      String json = "{ \"estado\": \"" + respostaApi + "\" }";
 
-
-      String response = String("HTTP/1.1 200 OK\r\n") + "Content-Type: application/json\r\n" + "Access-Control-Allow-Origin: *\r\n" + "Connection: close\r\n\r\n" + json;
+      String response = String("HTTP/1.1 200 OK\r\n") +
+                        "Content-Type: application/json\r\n" +
+                        "Access-Control-Allow-Origin: *\r\n" +
+                        "Connection: close\r\n\r\n" +
+                        json;
 
 
       String cipSend = "AT+CIPSEND=";
@@ -100,10 +104,10 @@ void loop() {
       cipSend += response.length();
 
       sendCommand(cipSend);
-      delay(100);  // pequena espera para garantir o ">" do AT+CIPSEND
+      delay(100); // pequena espera para garantir o ">" do AT+CIPSEND
       if (ESP_Serial.find(">")) {
         ESP_Serial.print(response);
-        delay(100);  // tempo para enviar tudo
+        delay(100); // tempo para enviar tudo
       } else {
         Serial.println("Erro ao iniciar envio com CIPSEND");
       }
@@ -124,7 +128,7 @@ void sendCommand(String cmd) {
 }
 
 void readResponse(unsigned int timeout) {
-  unsigned long timeIn = millis();  //momento que entramos nessa funcao é salvo
+  unsigned long timeIn = millis(); //momento que entramos nessa funcao é salvo
   resposta = "";
   while (timeIn + timeout > millis()) {
     if (ESP_Serial.available()) {

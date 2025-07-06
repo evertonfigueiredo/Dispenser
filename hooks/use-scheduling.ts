@@ -16,7 +16,7 @@ export function useScheduling() {
       
       // Check if scheduling in the past
       if (scheduledDateTime <= new Date()) {
-        toast("Invalid Time", {
+        toast("Hora Inválida", {
           description: "Não é possível agendar a ativação no passado.",
           action: {
             label: "Close",
@@ -32,11 +32,11 @@ export function useScheduling() {
       )
 
       if (isDuplicate) {
-        toast("Duplicate Schedule", {
-          description: `Channel ${channel} is already scheduled for this date and time.`,
+        toast("Agendamento Duplicado", {
+          description: `O canal ${channel} já está agendado para esta data e hora.`,
           action: {
-            label: "Close",
-            onClick: () => console.log("Close"),
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
           },
         })
         return false
@@ -54,13 +54,13 @@ export function useScheduling() {
         [...prev, newCommand].sort((a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime()),
       )
 
-      toast("Schedule Added", {
-          description: `Channel ${channel} scheduled for activation.`,
+      toast("Agendamento Adicionado", {
+          description: `Canal ${channel} agendado para ativação.`,
           action: {
-            label: "Close",
-            onClick: () => console.log("Close"),
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
           },
-        })
+        })  
 
       return true
     },
@@ -70,11 +70,11 @@ export function useScheduling() {
   const removeScheduledCommand = useCallback((id: string) => {
     setScheduledCommands((prev) => prev.filter((cmd) => cmd.id !== id))
     toast(
-      "Schedule Removed", {
-      description: "Scheduled command has been removed.",
+      "Agendamento Removido", {
+      description: "O comando agendado foi removido.",
       action: {
-        label: "Close",
-        onClick: () => console.log("Close"),
+      label: "Fechar",
+      onClick: () => console.log("Fechar"),
       },
     })
   }, [])
