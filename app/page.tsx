@@ -26,7 +26,8 @@ export default function DeviceControlPage() {
   const ws = useRef<WebSocket | null>(null)
 
   const connectWebSocket = () => {
-    const socket = new WebSocket("ws://192.168.1.11:4000")
+   const socket = new WebSocket(`ws://${process.env.NEXT_PUBLIC_MY_IP}:4000`)
+
     ws.current = socket
 
     socket.onopen = () => {
@@ -38,6 +39,7 @@ export default function DeviceControlPage() {
       try {
         const data = JSON.parse(event.data) // ex: { estado1: "ligado", estado2: "desligado" }
         // console.log("Estado do ESP:", data)
+        
         setDevices((prev) =>
           prev.map((device) => {
             const key = `estado`
