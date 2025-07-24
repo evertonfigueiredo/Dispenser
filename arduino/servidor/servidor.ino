@@ -14,8 +14,8 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Wi-Fi
-const char* ssid = "COMPUTADOR";
-const char* password = "demetrio";
+const char* ssid = "";
+const char* password = "";
 
 // WebServer
 WebServer server(80);
