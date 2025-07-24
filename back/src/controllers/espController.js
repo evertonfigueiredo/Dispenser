@@ -5,12 +5,14 @@ const ESP_IP = process.env.ESP_IP;
 const getStatus = async (req, res) => {
   try {
     if (process.env.NODE_ENV === "development") {
-      const status = {
-        estado: "ligado",
-      };
+      const mockStatus = Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        status: "off"
+      }));
+
       return res.status(200).json({
         statusCode: 200,
-        data: status,
+        data: mockStatus,
       });
     }
 
@@ -33,12 +35,12 @@ const getStatus = async (req, res) => {
 
 
 const sendCommand = async (req, res) => {
-  const { command } = req.body;
-
-  if (!["ligar", "desligar"].includes(command)) {
+  const { command, id } = req.body;
+  
+  if (!["ligar", "desligar"].includes(command) || typeof id !== "number") {
     return res.status(400).json({
       statusCode: 400,
-      message: "Comando inválido"
+      message: "Comando inválido ou ID ausente/inválido"
     });
   }
 
@@ -46,13 +48,16 @@ const sendCommand = async (req, res) => {
     if (process.env.NODE_ENV === "development") {
       return res.status(200).json({
         statusCode: 200,
-        message: `Mock: comando '${command}' executado`,
-        data: { estado: command === "ligar" ? "ligadooooo" : "desligado" }
+        message: `Mock: comando '${command}' executado para o ID ${id}`,
+        data: {
+          id,
+          status: command === "ligar" ? "on" : "off"
+        }
       });
     }
 
-    const response = await fetch(`${ESP_IP}/${command}`);
-    const status = await response.json();
+    const response = await fetch(`${ESP_IP}/${command}?id=${id}`);
+    const status = await response.json(); // espera: { id, status }
 
     res.status(200).json({
       statusCode: 200,

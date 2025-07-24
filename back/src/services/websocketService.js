@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws';
+import { WebSocketServer } from "ws";
 import fetch from "node-fetch";
 
 const ESP_IP = process.env.ESP_IP;
@@ -10,35 +10,54 @@ function initWebSocket(server) {
   wss.on("connection", (ws) => {
     console.log("Cliente conectado via WS");
 
+    // Envia status inicial
     if (isDev) {
-      const mockStatus = { estado: "ligado" };
+      const mockStatus = Array.from({ length: 10 }, (_, i) => ({
+        id: i + 1,
+        status: "off",
+      }));
       ws.send(JSON.stringify(mockStatus));
     } else {
       fetch(`${ESP_IP}/status`)
-        .then(res => res.json())
-        .then(status => ws.send(JSON.stringify(status)))
-        .catch(err => console.error("Erro ao buscar status inicial:", err));
+        .then((res) => res.json())
+        .then((status) => ws.send(JSON.stringify(status)))
+        .catch((err) => console.error("Erro ao buscar status inicial:", err));
     }
 
+    // Escuta mensagens de comando
     ws.on("message", async (message) => {
-      const cmd = message.toString();
-      if (!["ligar", "desligar"].includes(cmd)) return;
+      const msg = message.toString(); // exemplo: "ligar?id=3"
+      const [acao, query] = msg.split("?"); // "ligar", "id=3"
+
+      if (!["ligar", "desligar"].includes(acao)) return;
+
+      const params = new URLSearchParams(query);
+      const id = params.get("id");
+
+      if (!id) {
+        console.warn("Comando recebido sem ID:", msg);
+        return;
+      }
 
       if (isDev) {
-        const mockStatus = { estado: cmd === "ligar" ? "ligado" : "desligado" };
-        console.log(`[MOCK] Comando '${cmd}' recebido. Estado simulado:`, mockStatus);
+        const mockStatus = Array.from({ length: 10 }, (_, i) => ({
+          id: i + 1,
+          status: i + 1 === parseInt(id) ? (acao === "ligar" ? "on" : "off") : "off",
+        }));
 
-        wss.clients.forEach(client => {
+        console.log(`[MOCK] Comando '${acao}' recebido para ID ${id}.`);
+
+        wss.clients.forEach((client) => {
           if (client.readyState === ws.OPEN) {
             client.send(JSON.stringify(mockStatus));
           }
         });
       } else {
         try {
-          const response = await fetch(`${ESP_IP}/${cmd}`);
+          const response = await fetch(`${ESP_IP}/${acao}?id=${id}`);
           const status = await response.json();
-
-          wss.clients.forEach(client => {
+          
+          wss.clients.forEach((client) => {
             if (client.readyState === ws.OPEN) {
               client.send(JSON.stringify(status));
             }
